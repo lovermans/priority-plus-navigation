@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priority Plus Nav - SVG Icons</title>
+    <style>
+        :root {
+            --nav-height: 64px;
+            --color-text: #5f6368;
+            --color-text-hover: #1a73e8;
+            --bg-color: #ffffff;
+            --border-color: #dadce0;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Google Sans', Roboto, Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .app-bar {
+            background: var(--bg-color);
+            height: var(--nav-height);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 20px;
+            color: #202124;
+            margin-right: 30px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Container Navigasi */
+        .nav-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            overflow: hidden; 
+            height: 100%;
+        }
+
+        .primary-nav {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100%;
+        }
+
+        .nav-item {
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--color-text);
+            padding: 0 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column; /* Ikon di atas, teks kecil di bawah (opsional) */
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s;
+            gap: 4px;
+        }
+
+        .nav-link svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .nav-link span {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: var(--color-text-hover);
+            background-color: #f8f9ff;
+        }
+
+        /* Tombol More */
+        .more-trigger {
+            display: none;
+            height: 100%;
+            align-items: center;
+            margin-left: 10px;
+        }
+
+        .more-btn {
+            background: #f1f3f4;
+            border: none;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Dropdown Overflow */
+        .overflow-nav {
+            position: absolute;
+            top: 70px;
+            right: 24px;
+            background: white;
+            list-style: none;
+            margin: 0;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s;
+            z-index: 100;
+        }
+
+        .overflow-nav.is-open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Layout di dalam dropdown agar horizontal (ikon & teks sampingan) */
+        .overflow-nav .nav-link {
+            flex-direction: row;
+            justify-content: flex-start;
+            padding: 12px 16px;
+            border-radius: 6px;
+            height: auto;
+        }
+        
+        .overflow-nav .nav-link span {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="app-bar">
+        <a href="#" class="logo">IconNav</a>
+
+        <div class="nav-wrapper">
+            <ul class="primary-nav" id="primaryNav">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        <span>Likes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        <span>Mail</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <span>Profile</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+                        <span>Settings</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                        <span>Info</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                        <span>Gallery</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="more-trigger" id="moreTrigger">
+            <button class="more-btn" id="moreBtn">•••</button>
+            <ul class="overflow-nav" id="overflowNav"></ul>
+        </div>
+    </nav>
+
+    <div style="padding: 40px; max-width: 800px; margin: 0 auto;">
+        <h1>SVG Icon Navigation</h1>
+        <p>Logika JavaScript tetap sama. Ketika lebar layar mengecil, item SVG akan "lompat" ke dalam menu titik tiga.</p>
+    </div>
+
+    <script>
+        const primaryNav = document.getElementById('primaryNav');
+        const overflowNav = document.getElementById('overflowNav');
+        const moreTrigger = document.getElementById('moreTrigger');
+        const moreBtn = document.getElementById('moreBtn');
+        const navWrapper = document.querySelector('.nav-wrapper');
+
+        moreBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            overflowNav.classList.toggle('is-open');
+        });
+
+        document.addEventListener('click', () => {
+            overflowNav.classList.remove('is-open');
+        });
+
+        function adaptNavigation() {
+            const availableWidth = navWrapper.offsetWidth;
+            
+            // Pindahkan kembali ke utama dulu untuk cek ruang
+            while (overflowNav.children.length > 0) {
+                primaryNav.appendChild(overflowNav.firstElementChild);
+                if (primaryNav.scrollWidth > availableWidth) {
+                    overflowNav.insertBefore(primaryNav.lastElementChild, overflowNav.firstChild);
+                    break;
+                }
+            }
+
+            // Pindahkan ke overflow jika sempit
+            while (primaryNav.scrollWidth > availableWidth && primaryNav.children.length > 0) {
+                if (overflowNav.children.length > 0) {
+                    overflowNav.insertBefore(primaryNav.lastElementChild, overflowNav.firstChild);
+                } else {
+                    overflowNav.appendChild(primaryNav.lastElementChild);
+                }
+            }
+
+            // Tampilkan/Sembunyikan tombol "More"
+            moreTrigger.style.display = overflowNav.children.length > 0 ? 'flex' : 'none';
+            if (overflowNav.children.length === 0) overflowNav.classList.remove('is-open');
+        }
+
+        const resizeObserver = new ResizeObserver(() => {
+            window.requestAnimationFrame(adaptNavigation);
+        });
+
+        resizeObserver.observe(navWrapper);
+        window.addEventListener('load', adaptNavigation);
+    </script>
+</body>
+</html>
