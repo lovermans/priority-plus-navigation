@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priority Plus Navigation - Final Version</title>
+    <style>
+        :root {
+            --nav-height: 64px;
+            --accent: #1a73e8;
+            --text-main: #5f6368;
+            --sidebar-width: 280px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body { 
+            margin: 0; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: #f8f9fa; 
+            color: #202124;
+        }
+        
+        ul { list-style: none; margin: 0; padding: 0; }
+        a { text-decoration: none; color: inherit; }
+
+        /* --- App Bar Layout --- */
+        .app-bar {
+            background: #ffffff;
+            height: var(--nav-height);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .left-section {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        /* Hamburger Button */
+        #hamBtn {
+            width: 48px;
+            height: 48px;
+            display: none; /* Muncul via JS */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin-right: 8px;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+        #hamBtn:hover { background: #f1f3f4; }
+        #hamBtn span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: #5f6368;
+            margin: 2px 0;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            white-space: nowrap;
+            letter-spacing: -0.5px;
+        }
+
+        /* --- Desktop Navigation --- */
+        .nav-outer {
+            flex: 1;
+            height: 100%;
+            overflow: hidden; /* Penting untuk deteksi overflow */
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        #mainNav {
+            display: flex;
+            height: 100%;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+
+        .nav-item {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0; /* Mencegah teks gepeng */
+            position: relative;
+        }
+
+        .nav-link {
+            padding: 0 16px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: background 0.2s, color 0.2s;
+        }
+        .nav-link:hover { background: #f8f9fa; color: #202124; }
+
+        /* Submenu Desktop (Hover) */
+        .has-submenu { position: relative; }
+        .submenu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #fff;
+            min-width: 200px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: none;
+            border-radius: 0 0 4px 4px;
+            border: 1px solid #dadce0;
+        }
+        .nav-item:hover .submenu { display: block; }
+        .submenu .nav-item { display: block; width: 100%; height: auto; }
+        .submenu .nav-link { height: 48px; padding: 0 20px; }
+
+        /* --- Sidebar & Drawer --- */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(32, 33, 36, 0.6);
+            display: none;
+            z-index: 2000;
+            backdrop-filter: blur(2px);
+        }
+        .overlay.active { display: block; }
+
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: var(--sidebar-width);
+            background: #ffffff;
+            z-index: 2001;
+            transform: translateX(-100%);
+            transition: transform var(--transition);
+            padding-top: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar.open { transform: translateX(0); }
+
+        /* Sidebar Accordion Style */
+        .sidebar .nav-item {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        .sidebar .nav-link {
+            height: 56px;
+            padding: 0 24px;
+            justify-content: space-between;
+        }
+        .sidebar .has-submenu > .nav-link::after {
+            content: '▾';
+            transition: transform 0.2s;
+        }
+        .sidebar .is-open > .nav-link::after { transform: rotate(180deg); }
+
+        .sidebar .submenu {
+            position: static;
+            box-shadow: none;
+            display: none;
+            background: #f8f9fa;
+            border: none;
+            padding-left: 16px;
+        }
+        .sidebar .is-open .submenu { display: block; }
+    </style>
+</head>
+<body>
+
+    <header class="app-bar">
+        <div class="left-section">
+            <div id="hamBtn" title="Menu">
+                <span></span><span></span><span></span>
+            </div>
+            <a href="#" class="logo">web.dev</a>
+        </div>
+
+        <div class="nav-outer" id="navOuter">
+            <ul id="mainNav">
+                <li class="nav-item"><a href="#" class="nav-link">Learn</a></li>
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">Explore</a>
+                    <ul class="submenu">
+                        <li class="nav-item"><a href="#" class="nav-link">Case Studies</a></li>
+                        <li class="nav-item"><a href="#" class="nav-link">Podcasts</a></li>
+                        <li class="nav-item"><a href="#" class="nav-link">Shows</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item"><a href="#" class="nav-link">Blog</a></li>
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">Patterns</a>
+                    <ul class="submenu">
+                        <li class="nav-item"><a href="#" class="nav-link">Layout</a></li>
+                        <li class="nav-item"><a href="#" class="nav-link">Interaction</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item"><a href="#" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Community</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Contact</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="overlay" id="overlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <div id="sideItems"></div>
+    </aside>
+
+    <main style="padding: 40px; max-width: 800px; margin: 0 auto; line-height: 1.6;">
+        <h1>Priority Plus Navigation (Fixed)</h1>
+        <p>Gunakan fitur <strong>Inspect Element</strong> lalu ubah ukuran layar ke mode mobile atau tarik jendela browser Anda.</p>
+        <ul>
+            <li>Item yang tidak muat di kanan akan pindah ke hamburger di kiri.</li>
+            <li>Jika semua item sudah kembali ke navbar atas, sidebar akan <strong>otomatis tertutup</strong>.</li>
+            <li>Menu bertingkat menjadi <strong>accordion</strong> di sidebar.</li>
+        </ul>
+    </main>
+
+    <script>
+        const mainNav = document.getElementById('mainNav');
+        const navOuter = document.getElementById('navOuter');
+        const hamBtn = document.getElementById('hamBtn');
+        const sideItems = document.getElementById('sideItems');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        // Simpan referensi item menu asli (statis)
+        const originalItems = Array.from(mainNav.children);
+
+        /**
+         * Fungsi utama untuk mengatur ulang navigasi berdasarkan lebar layar
+         */
+        function rebuildNav() {
+            // 1. Reset: Kembalikan semua item ke Navbar Utama
+            originalItems.forEach(item => {
+                item.classList.remove('is-open'); // Reset state accordion
+                mainNav.appendChild(item);
+            });
+
+            // 2. Sembunyikan hamburger sementara untuk pengukuran bersih
+            hamBtn.style.display = 'none';
+
+            let itemsToMove = [];
+            
+            // 3. Deteksi Overflow
+            // Selama konten (scrollWidth) lebih besar dari ruang tersedia (clientWidth)
+            while (mainNav.scrollWidth > navOuter.clientWidth && mainNav.children.length > 0) {
+                const item = mainNav.lastElementChild;
+                itemsToMove.push(item);
+                item.remove(); // Hapus sementara dari DOM agar scrollWidth mengecil
+                hamBtn.style.display = 'flex'; // Tampilkan hamburger karena ada isi
+            }
+
+            // 4. Masukkan item yang meluber ke dalam Sidebar
+            sideItems.innerHTML = '';
+            // Gunakan reverse() agar urutan di sidebar sama dengan urutan di navbar (kiri-ke-kanan jadi atas-ke-bawah)
+            itemsToMove.reverse().forEach(item => {
+                sideItems.appendChild(item);
+            });
+
+            // 5. AUTO-CLOSE: Jika sidebar kosong, pastikan sidebar & overlay tertutup
+            if (sideItems.children.length === 0) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+        }
+
+        // --- Event Listeners ---
+
+        // Buka Sidebar
+        hamBtn.onclick = () => {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+        };
+
+        // Tutup Sidebar (klik di luar atau overlay)
+        overlay.onclick = () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        };
+
+        // Logika Accordion di Sidebar (Event Delegation)
+        sideItems.onclick = (e) => {
+            const link = e.target.closest('.has-submenu > .nav-link');
+            if (link) {
+                e.preventDefault();
+                link.parentElement.classList.toggle('is-open');
+            }
+        };
+
+        // --- Engine Resizing ---
+        // ResizeObserver memantau perubahan ukuran elemen kontainer navigasi secara real-time
+        const observer = new ResizeObserver(() => {
+            window.requestAnimationFrame(rebuildNav);
+        });
+
+        observer.observe(navOuter);
+
+        // Jalankan sekali saat halaman dimuat
+        window.onload = rebuildNav;
+    </script>
+</body>
+</html>
