@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priority Plus Nav - Web.dev Style</title>
+    <style>
+        /* --- Reset & Font --- */
+        :root {
+            --nav-height: 64px;
+            --color-text: #5f6368;
+            --color-text-hover: #202124;
+            --bg-color: #ffffff;
+            --border-color: #dadce0;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Google Sans', Roboto, Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* --- Container Navigasi Utama --- */
+        .app-bar {
+            background: var(--bg-color);
+            height: var(--nav-height);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+            position: relative;
+        }
+
+        /* Logo */
+        .logo {
+            font-weight: bold;
+            font-size: 22px;
+            color: #202124;
+            margin-right: 40px;
+            white-space: nowrap;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Container untuk Item Navigasi */
+        .nav-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            overflow: hidden; /* Penting untuk mendeteksi batas */
+            height: 100%;
+        }
+
+        /* List Utama (Visible) */
+        .primary-nav {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100%;
+            width: 100%;
+        }
+
+        .nav-item {
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--color-text);
+            padding: 0 16px;
+            font-size: 14px;
+            font-weight: 500;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            white-space: nowrap; /* Mencegah teks turun ke bawah */
+            transition: color 0.2s, background-color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--color-text-hover);
+            background-color: #f1f3f4;
+        }
+
+        /* --- Tombol "More" (Priority Plus Trigger) --- */
+        .more-trigger {
+            display: none; /* Hidden by default */
+            padding-left: 10px;
+            position: relative;
+            height: 100%;
+            align-items: center;
+        }
+
+        .more-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--color-text);
+            font-weight: 500;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            height: 40px;
+            padding: 0 12px;
+            border-radius: 4px;
+        }
+
+        .more-btn:hover {
+            background-color: #f1f3f4;
+            color: var(--color-text-hover);
+        }
+
+        .more-btn::after {
+            content: '▼';
+            font-size: 10px;
+            margin-left: 6px;
+        }
+
+        /* --- Dropdown Overflow --- */
+        .overflow-nav {
+            position: absolute;
+            top: 100%; /* Tepat di bawah navbar */
+            right: 24px;
+            background: white;
+            list-style: none;
+            margin: 0;
+            padding: 8px 0;
+            border: 1px solid var(--border-color);
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+
+        .overflow-nav.is-open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .overflow-nav .nav-item {
+            height: auto;
+            display: block;
+        }
+
+        .overflow-nav .nav-link {
+            height: 48px;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Helper Class */
+        .visually-hidden {
+            position: absolute !important;
+            height: 1px; width: 1px; 
+            overflow: hidden;
+            clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+            clip: rect(1px, 1px, 1px, 1px);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="app-bar">
+        <a href="#" class="logo">
+            <span style="color:#1a73e8">&lt;/&gt;</span>&nbsp;web.dev
+        </a>
+
+        <div class="nav-wrapper">
+            <ul class="primary-nav" id="primaryNav">
+                <li class="nav-item"><a href="#" class="nav-link">Learn</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Measure</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Blog</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Case Studies</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Community</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Podcasts</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Events</a></li>
+            </ul>
+        </div>
+
+        <div class="more-trigger" id="moreTrigger">
+            <button class="more-btn" id="moreBtn">More</button>
+            <ul class="overflow-nav" id="overflowNav">
+                </ul>
+        </div>
+    </nav>
+
+    <div style="padding: 40px; max-width: 800px; margin: 0 auto;">
+        <h1>Priority Plus Navigation</h1>
+        <p>Coba ubah ukuran (resize) jendela browser Anda. Item menu akan otomatis berpindah ke tombol "More" jika tidak cukup ruang.</p>
+        <p>Ini dibuat menggunakan <strong>Vanilla JavaScript</strong> tanpa library eksternal.</p>
+    </div>
+
+    <script>
+        // --- Seleksi Elemen ---
+        const primaryNav = document.getElementById('primaryNav');
+        const overflowNav = document.getElementById('overflowNav');
+        const moreTrigger = document.getElementById('moreTrigger');
+        const moreBtn = document.getElementById('moreBtn');
+        const navWrapper = document.querySelector('.nav-wrapper');
+
+        // --- State Dropdown ---
+        moreBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Mencegah event bubbling
+            overflowNav.classList.toggle('is-open');
+        });
+
+        // Tutup dropdown jika klik di luar
+        document.addEventListener('click', () => {
+            overflowNav.classList.remove('is-open');
+        });
+
+        // --- Logika Priority Plus ---
+        
+        function adaptNavigation() {
+            // 1. Dapatkan lebar container yang tersedia
+            const availableWidth = navWrapper.offsetWidth;
+            
+            // 2. Jika overflow list punya item, coba kembalikan ke primary dulu
+            //    untuk mengecek apakah sekarang sudah muat.
+            while (overflowNav.children.length > 0) {
+                // Pindahkan item pertama dari overflow kembali ke akhir primary
+                primaryNav.appendChild(overflowNav.firstElementChild);
+                
+                // Jika setelah dipindahkan ternyata tidak muat, kembalikan lagi ke overflow dan stop loop
+                if (primaryNav.scrollWidth > availableWidth) {
+                     overflowNav.insertBefore(primaryNav.lastElementChild, overflowNav.firstChild);
+                     break; 
+                }
+            }
+
+            // 3. Jika primary nav meluber (overflowing), pindahkan item ke overflow list
+            //    Kita loop selama scrollWidth > offsetWidth
+            while (primaryNav.scrollWidth > availableWidth && primaryNav.children.length > 0) {
+                // Pindahkan item terakhir dari primary ke awal overflow
+                if (overflowNav.children.length > 0) {
+                    overflowNav.insertBefore(primaryNav.lastElementChild, overflowNav.firstChild);
+                } else {
+                    overflowNav.appendChild(primaryNav.lastElementChild);
+                }
+            }
+
+            // 4. Atur visibilitas tombol "More"
+            if (overflowNav.children.length > 0) {
+                moreTrigger.style.display = 'flex';
+            } else {
+                moreTrigger.style.display = 'none';
+                overflowNav.classList.remove('is-open'); // Pastikan tertutup jika kosong
+            }
+        }
+
+        // --- Event Listeners ---
+        
+        // Gunakan ResizeObserver untuk performa lebih baik daripada window.onresize
+        // Ini akan mendeteksi perubahan ukuran pada container wrapper
+        const resizeObserver = new ResizeObserver(entries => {
+            // Jalankan logika adaptasi
+            // requestAnimationFrame memastikan UI smooth
+            window.requestAnimationFrame(adaptNavigation);
+        });
+
+        resizeObserver.observe(navWrapper);
+
+        // Jalankan sekali saat load
+        window.addEventListener('load', adaptNavigation);
+
+    </script>
+</body>
+</html>
