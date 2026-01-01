@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Priority Nav - Dynamic Simulation</title>
+    <title>Priority Nav - Perfect Right Align</title>
     <style>
         :root {
             --nav-height: 64px;
+            --primary-blue: #1a73e8;
             --color-text: #5f6368;
             --border-color: #dadce0;
-            --primary-blue: #1a73e8;
         }
 
-        body { margin: 0; font-family: 'Google Sans', Roboto, Arial, sans-serif; background: #f8f9fa; }
+        body { margin: 0; font-family: 'Google Sans', sans-serif; background: #f8f9fa; }
 
-        /* --- Navbar Styles --- */
         .app-bar {
             background: #fff;
             height: var(--nav-height);
@@ -24,14 +23,19 @@
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
-            z-index: 10;
+            z-index: 100;
         }
 
+        .logo { font-weight: bold; text-decoration: none; color: var(--primary-blue); flex-shrink: 0; }
+
+        /* --- Nav Wrapper --- */
         .nav-wrapper {
             flex: 1;
             height: 100%;
-            overflow: hidden;
             display: flex;
+            justify-content: flex-end; /* Dorong semua ke kanan */
+            overflow: hidden;
+            margin-left: 20px;
         }
 
         .primary-nav {
@@ -39,7 +43,6 @@
             margin: 0;
             padding: 0;
             display: flex;
-            width: 100%;
             height: 100%;
             align-items: center;
         }
@@ -68,10 +71,20 @@
 
         .nav-link:hover, .more-btn:hover { background-color: #f1f3f4; }
 
-        .more-trigger { order: 999; display: none; }
-        .more-btn::after { content: ' ▼'; font-size: 9px; }
+        /* --- Tombol More --- */
+        .more-trigger {
+            display: none; /* Hilang total dari layout saat tidak dibutuhkan */
+            order: 999;
+            flex-shrink: 0;
+        }
 
-        /* --- Popover Styles --- */
+        .more-trigger.is-visible {
+            display: flex; /* Hanya ambil ruang saat ada item di overflow */
+        }
+
+        .more-btn::after { content: ' ▼'; font-size: 9px; margin-left: 4px; }
+
+        /* --- Popover --- */
         .overflow-menu {
             padding: 8px 0;
             margin: 0;
@@ -88,43 +101,22 @@
 
         .overflow-menu .nav-item { display: block; }
         .overflow-menu .nav-link { height: 44px; width: 100%; box-sizing: border-box; }
-
-        /* --- Simulation Panel Styles --- */
-        .simulation-panel {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 24px;
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-        }
-
-        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
         
-        button.action-btn {
-            padding: 10px 20px;
-            border-radius: 4px;
-            border: 1px solid var(--border-color);
-            background: white;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        button.action-btn:hover { background: #f8f9fa; }
-        button.add-btn { background: var(--primary-blue); color: white; border: none; }
-        button.add-btn:hover { background: #1557b0; }
+        .controls { padding: 40px; text-align: center; }
     </style>
 </head>
 <body>
 
     <nav class="app-bar">
-        <a href="#" style="font-weight:bold; margin-right:32px; text-decoration:none; color:var(--primary-blue);">web.dev</a>
+        <a href="#" class="logo">web.dev</a>
         
         <div class="nav-wrapper" id="mainNavWrapper">
             <ul class="primary-nav">
                 <li class="nav-item"><a href="#" class="nav-link">Learn</a></li>
                 <li class="nav-item"><a href="#" class="nav-link">Measure</a></li>
                 <li class="nav-item"><a href="#" class="nav-link">Blog</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Case Studies</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">About</a></li>
                 
                 <li class="nav-item more-trigger">
                     <button class="more-btn" popovertarget="mainOverflow">More</button>
@@ -135,95 +127,82 @@
 
     <ul id="mainOverflow" class="overflow-menu" popover></ul>
 
-    <div class="simulation-panel">
-        <h2>Simulasi Menu Dinamis</h2>
-        <p>Gunakan tombol di bawah untuk memanipulasi struktur DOM. Sistem akan otomatis menghitung apakah menu muat di navbar atau harus masuk ke "More".</p>
-        
-        <div class="btn-group">
-            <button class="action-btn add-btn" id="addMenu">Tambah Menu Baru</button>
-            <button class="action-btn" id="removeMenu">Hapus Menu Terakhir</button>
-        </div>
+    <div class="controls">
+        <button id="addBtn" style="padding: 8px 16px; cursor: pointer;">Tambah Menu</button>
+        <button id="removeBtn" style="padding: 8px 16px; cursor: pointer;">Hapus Menu</button>
     </div>
 
     <script>
         function initPriorityNav(wrapper, overflow) {
-            const primaryNav = wrapper.querySelector('ul');
+            const primaryNav = wrapper.querySelector('.primary-nav');
             const moreTrigger = wrapper.querySelector('.more-trigger');
 
             const adapt = () => {
-                const buffer = 2; // Toleransi pembulatan piksel
-
-                // 1. Pindahkan ke overflow jika meluber
+                // Gunakan buffer kecil untuk stabilitas
+                const buffer = 2;
+                
+                // 1. Pindahkan ke overflow jika sesak
+                // Kita cek scrollWidth vs offsetWidth dari wrapper
                 while (primaryNav.scrollWidth > (wrapper.offsetWidth + buffer) && primaryNav.children.length > 1) {
                     const itemToMove = moreTrigger.previousElementSibling;
                     if (!itemToMove) break;
+                    
+                    // Sebelum pindah, pastikan tombol More muncul agar kalkulasi lebar akurat
+                    moreTrigger.classList.add('is-visible');
                     overflow.insertBefore(itemToMove, overflow.firstChild);
                 }
 
-                // 2. Tarik kembali ke primary jika ruang cukup
+                // 2. Tarik kembali ke primary jika ada ruang
                 while (overflow.children.length > 0) {
                     const itemToRecover = overflow.firstElementChild;
                     primaryNav.insertBefore(itemToRecover, moreTrigger);
 
+                    // Jika meluber setelah ditarik, kembalikan ke overflow
                     if (primaryNav.scrollWidth > (wrapper.offsetWidth + buffer)) {
                         overflow.insertBefore(itemToRecover, overflow.firstChild);
                         break;
                     }
                 }
 
-                // 3. Update UI
+                // 3. Final Check: Jika overflow kosong, hilangkan tombol More sama sekali
                 const hasItems = overflow.children.length > 0;
-                moreTrigger.style.display = hasItems ? 'flex' : 'none';
-                if (!hasItems) try { overflow.hidePopover(); } catch(e) {}
+                if (!hasItems) {
+                    moreTrigger.classList.remove('is-visible');
+                    if (overflow.matches(':popover-open')) overflow.hidePopover();
+                } else {
+                    moreTrigger.classList.add('is-visible');
+                }
             };
 
-            const ro = new ResizeObserver(() => window.requestAnimationFrame(adapt));
-            ro.observe(wrapper);
-
+            new ResizeObserver(() => window.requestAnimationFrame(adapt)).observe(wrapper);
+            
             const mo = new MutationObserver(() => {
-                mo.disconnect(); // Hindari feedback loop
+                mo.disconnect();
                 adapt();
                 mo.observe(primaryNav, { childList: true });
             });
-            
             mo.observe(primaryNav, { childList: true });
+
+            window.addEventListener('load', adapt);
             adapt();
         }
 
-        // Inisialisasi
-        const navWrap = document.getElementById('mainNavWrapper');
-        const overFlow = document.getElementById('mainOverflow');
-        initPriorityNav(navWrap, overFlow);
+        initPriorityNav(document.getElementById('mainNavWrapper'), document.getElementById('mainOverflow'));
 
-        // --- Logika Simulasi ---
-        const menuNames = ['Case Studies', 'About', 'Community', 'Podcasts', 'Events', 'Courses', 'Newsletter', 'Terms'];
-        let menuIndex = 0;
-
-        document.getElementById('addMenu').addEventListener('click', () => {
-            const primaryNav = navWrap.querySelector('.primary-nav');
-            const moreTrigger = navWrap.querySelector('.more-trigger');
-            const name = menuNames[menuIndex % menuNames.length] + ' ' + (Math.floor(menuIndex / menuNames.length) + 1);
-            
+        // Simulasi
+        document.getElementById('addBtn').addEventListener('click', () => {
+            const nav = document.querySelector('.primary-nav');
+            const trigger = document.querySelector('.more-trigger');
             const li = document.createElement('li');
             li.className = 'nav-item';
-            li.innerHTML = `<a href="#" class="nav-link">${name}</a>`;
-            
-            primaryNav.insertBefore(li, moreTrigger);
-            menuIndex++;
+            li.innerHTML = `<a href="#" class="nav-link">New Menu ${nav.children.length}</a>`;
+            nav.insertBefore(li, trigger);
         });
 
-        document.getElementById('removeMenu').addEventListener('click', () => {
-            const primaryNav = navWrap.querySelector('.primary-nav');
-            const moreTrigger = navWrap.querySelector('.more-trigger');
-            const lastItem = moreTrigger.previousElementSibling;
-            
-            // Cek di primary nav dulu
-            if (lastItem) {
-                lastItem.remove();
-            } else if (overFlow.children.length > 0) {
-                // Jika primary kosong (selain button more), hapus dari overflow
-                overFlow.lastElementChild.remove();
-            }
+        document.getElementById('removeBtn').addEventListener('click', () => {
+            const trigger = document.querySelector('.more-trigger');
+            const lastItem = trigger.previousElementSibling;
+            if (lastItem) lastItem.remove();
         });
     </script>
 </body>
